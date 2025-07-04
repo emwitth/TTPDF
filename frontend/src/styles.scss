@@ -1,0 +1,23 @@
+$background: rgb(50, 49, 58);
+$text: #c6c6c9;
+$font: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+
+html {
+    color: $text;
+}
+
+body {
+    margin: 0;
+    color: $text;
+    font-family: $font;
+}
+
+.button {
+    background-color: #44446b;
+    color: $text;
+    font-family: $font;
+    height: 25px;
+    border-radius: 5px;
+}

@@ -1,0 +1,20 @@
+@use "../../styles.scss" as global;
+
+$action-bar-backround: #4b4862;
+$action-bar-backround-hover: #575371;
+
+.action-bar {
+    background-color: $action-bar-backround;
+    display: flex;
+    flex-direction: row;
+
+    .action-bar-button {
+        padding: 10px;
+    }.active{
+        background-color: global.$background;
+    }
+
+    .action-bar-button.inactive:hover {
+        background-color: $action-bar-backround-hover;
+    }
+}
