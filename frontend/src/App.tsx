@@ -43,9 +43,10 @@ function App() {
     }
 
     return (
-        <div id="App">
+        <div className='app'>
            <ActionBar onWorkspaceChange={onWorkspaceChange}/>
            <Workspace />
+           <object data='/Downloads/Vor.pdf'></object>
         </div>
     )
 }
