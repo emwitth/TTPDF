@@ -17,6 +17,9 @@ enum WORKSPACES {
 function App() {
     const [workspaceName, setWorkspaceName] = useState(WORKSPACES.Adventures);
 
+    let workspaceHeight: string = document.body.scrollHeight + "px";
+
+
     function onWorkspaceChange(name: string) {
         switch(name) {
             case "Adventures":
@@ -45,7 +48,9 @@ function App() {
     return (
         <div className='app'>
            <ActionBar onWorkspaceChange={onWorkspaceChange}/>
-           <Workspace />
+           <div className='workspace-area' style={{height: workspaceHeight}}>
+                <Workspace />
+           </div>
         </div>
     )
 }

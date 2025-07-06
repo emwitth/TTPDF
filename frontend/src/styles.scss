@@ -15,14 +15,17 @@ body {
     margin: 0;
     color: $text;
     font-family: $font;
+    height: 100vh;
 }
 
-.button {
+button {
     background-color: #44446b;
     color: $text;
     font-family: $font;
     height: 25px;
     border-radius: 5px;
+    border: 0px;
+    
 }
 
 button:hover {

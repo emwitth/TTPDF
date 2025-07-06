@@ -5,6 +5,7 @@ import './add.scss';
 import {useState} from 'react';
 import { MonsterAddElement, PDFMapMonster } from './monsterAddElement';
 import { PageAddElement, pdfMapPage } from './page';
+import { v4 as uuidGen } from 'uuid';
 
 // go imports
 import {GetPDF as GETPDF} from '../../../../wailsjs/go/main/App';
@@ -48,7 +49,7 @@ function AddButtonComponent({GetPDF, pdfName} : AddButtonComponentParameters) {
     return (
         <div>
             <div>Click to create or modify a pdf mapping</div><br />
-            <button className='button' onClick={GetPDF}>Choose PDF</button>
+            <button onClick={GetPDF}>Choose PDF</button>
         </div>
     );
     
@@ -61,28 +62,28 @@ interface AddModifyWorkingAreaParameters {
 function AddModifyWorkingArea({pdfName, pdfURL} : AddModifyWorkingAreaParameters) {
     const [pdfMap, setPDFMap] = useState(new Array<pdfMapPage>);
 
-    function addPDFMapEntry() {
-        let pageNumber: number = pdfMap.length > 0 ? pdfMap[pdfMap.length - 1].pageNumber : 1;
+    function addPage() {
+        let pageNumber: number = pdfMap.length > 0 ? pdfMap[pdfMap.length - 1].pageNumber + 1 : 1;
+        console.log(pageNumber);
         setPDFMap([
             ...pdfMap,
             {
+                id: uuidGen(),
                 pageNumber: pageNumber,
                 items: []
             }
         ]);
     }
 
-    function addItem(newPage: pdfMapPage) {
-        newPage.items.push(
-            {
-                name: "",
-                cr: 0,
-                type: "",
-                size: "",
-            }
-        );
+    function deletePage(id: string) {
+        let newPDFMap = pdfMap.filter(page => page.id !== id);
+        setPDFMap(newPDFMap);
+    }
+
+    function saveItem(newPage: pdfMapPage) {
+        console.log(newPage);
         let newPDFMap = pdfMap.map(page => {
-            if(page.pageNumber === newPage.pageNumber) {
+            if(page.id === newPage.id) {
                 return newPage;
             }
             return page
@@ -96,12 +97,12 @@ function AddModifyWorkingArea({pdfName, pdfURL} : AddModifyWorkingAreaParameters
                 Adding from {pdfName}
             </div>
             <div className='pages-container'>
-                {pdfMap.map( page => (
-                    <PageAddElement key={page.pageNumber} page={page} addItem={addItem}/>
+                {pdfMap.map( (page) => (
+                    <PageAddElement key={page.id} page={page} saveChange={saveItem} deletePage={deletePage}/>
                 ))}
-                <div className='page add-page' onClick={() => addPDFMapEntry()}>
+                <div className='page add-page' onClick={() => addPage()}>
                     <div style={{fontSize: "100px"}}>
-                    +
+                        <i className='fa fa-plus'></i>
                     </div>
                 </div>
             </div>

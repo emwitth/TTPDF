@@ -33,6 +33,15 @@
     border-radius: 10px;
     overflow: hidden;
     overflow-y: auto;
+
+    .page-header {
+        display: flex;
+        flex-direction: row;
+
+        .spacer {
+            flex-grow: 1;
+        }
+    }
 }
 
 .page:hover {
@@ -57,4 +66,22 @@
     margin: 5px;
     border: 2px solid global.$lines;
     border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+
+    .item-table-area {
+        flex-grow: 2;
+    }
+
+    .item-button-area {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        flex-grow: 1;
+
+        .item-button-grow {
+            flex-grow: 1;
+            margin: 2px;
+        }
+    }
 }
