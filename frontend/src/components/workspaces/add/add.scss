@@ -1,3 +1,5 @@
+@use "../../../styles.scss" as global;
+
 .add-container {
     flex-grow: 1;
     display: flex;
@@ -8,6 +10,51 @@
     flex-grow: 1;
     text-align: center;
     display: flex;
+    justify-content: center;
+}
+
+.work-container-centered-vertical {
     flex-direction: column;
     justify-content: center;
+}
+
+.pages-container {
+    flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+}
+
+.page {
+    padding: 5px;
+    margin: 5px;
+    height: 460px;
+    width: 340px;
+    border: 2px solid global.$lines;
+    border-radius: 10px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.page:hover {
+    border-color: global.$hover;
+}
+
+.add-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 80px;
+    color: global.$lines;
+    overflow-y: hidden;
+}
+.add-page:hover {
+    background-color: global.$hover;
+    color: global.$background;
+}
+
+.item {
+    padding: 5px;
+    margin: 5px;
+    border: 2px solid global.$lines;
+    border-radius: 10px;
 }
