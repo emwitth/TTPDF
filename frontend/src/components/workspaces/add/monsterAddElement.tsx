@@ -6,7 +6,7 @@ export interface PDFMapMonster
     id: string,
     name: string,
     cr: number
-    type: string,
+    monsterType: string,
     size: string,
 
 }
@@ -20,7 +20,7 @@ export function MonsterAddElement({monster, saveItem, deleteItem} : AddMonsterEl
     const [isEditing, setEditing] = useState(false);
     const [name, setName] = useState(monster.name);
     const [cr, setCR] = useState(monster.cr);
-    const [type, setType] = useState(monster.type);
+    const [type, setType] = useState(monster.monsterType);
     const [size, setSize] = useState(monster.size);
 
     function nameChange (event: React.ChangeEvent<HTMLInputElement>) {
@@ -44,7 +44,7 @@ export function MonsterAddElement({monster, saveItem, deleteItem} : AddMonsterEl
             id: monster.id,
             name: name,
             cr: cr,
-            type: type,
+            monsterType: type,
             size: size
         }
 

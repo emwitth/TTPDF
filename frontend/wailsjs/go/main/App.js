@@ -5,3 +5,15 @@
 export function GetPDF() {
   return window['go']['main']['App']['GetPDF']();
 }
+
+export function OpenPDFMap(arg1) {
+  return window['go']['main']['App']['OpenPDFMap'](arg1);
+}
+
+export function SaveCSV() {
+  return window['go']['main']['App']['SaveCSV']();
+}
+
+export function SavePDFMap(arg1, arg2) {
+  return window['go']['main']['App']['SavePDFMap'](arg1, arg2);
+}

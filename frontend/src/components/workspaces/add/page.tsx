@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { MonsterAddElement, PDFMapMonster } from './monsterAddElement';
 import { v4 as uuidGen } from 'uuid';
 
+// wails imports
+import { main } from '../../../../wailsjs/go/models';
+
 export interface pdfMapPage {
     id: string,
     pageNumber: number,
@@ -44,9 +47,9 @@ function PageNumber({pageNumber, savePageNumber} : PageNumberParameters) {
 }
 
 export interface AddPageParameters{
-    page: pdfMapPage,
+    page: main.PDFMapPage,
     deletePage: (id: string) => void,
-    saveChange: (newPage: pdfMapPage) => void
+    saveChange: (newPage: main.PDFMapPage) => void
 }
 export function PageAddElement({page, saveChange, deletePage}: AddPageParameters) {
 
@@ -56,17 +59,16 @@ export function PageAddElement({page, saveChange, deletePage}: AddPageParameters
             id: uuidGen(),
             name: '',
             cr: 0,
-            type: '',
+            monsterType: '',
             size: ''
         }
         let newItemList = page.items.map(item => item);
         newItemList.push(newItem);
         
-        let newPage: pdfMapPage = {
-            id: page.id,
-            pageNumber: page.pageNumber,
-            items: newItemList
-        }
+        let newPage: main.PDFMapPage = new main.PDFMapPage;
+        newPage.id= page.id;
+        newPage.pageNumber = page.pageNumber;
+        newPage.items = newItemList;
 
         saveChange(newPage);
     }
@@ -79,32 +81,29 @@ export function PageAddElement({page, saveChange, deletePage}: AddPageParameters
             return item;
         });
 
-        let newPage = {
-            id: page.id,
-            pageNumber: page.pageNumber,
-            items: newItems
-        }
+        let newPage: main.PDFMapPage = new main.PDFMapPage;
+        newPage.id= page.id;
+        newPage.pageNumber = page.pageNumber;
+        newPage.items = newItems;
 
         saveChange(newPage);
     }
 
     function deleteItem(id: string) {
         let newItems = page.items.filter(item => item.id !== id);
-        let newPage = {
-            id: page.id,
-            pageNumber: page.pageNumber,
-            items: newItems
-        }
+        let newPage: main.PDFMapPage = new main.PDFMapPage;
+        newPage.id= page.id;
+        newPage.pageNumber = page.pageNumber;
+        newPage.items = newItems;
 
         saveChange(newPage);
     }
 
     function savePageNumber(newPageNumber: number) {
-        let newPage = {
-            id: page.id,
-            pageNumber: newPageNumber,
-            items: page.items
-        }
+        let newPage: main.PDFMapPage = new main.PDFMapPage;
+        newPage.id= page.id;
+        newPage.pageNumber = newPageNumber;
+        newPage.items = page.items;
 
         saveChange(newPage);
     }

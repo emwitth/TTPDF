@@ -19,7 +19,6 @@ function App() {
 
     let workspaceHeight: string = document.body.scrollHeight + "px";
 
-
     function onWorkspaceChange(name: string) {
         switch(name) {
             case "Adventures":

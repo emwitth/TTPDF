@@ -3,19 +3,20 @@ import './add.scss';
 
 // react imports
 import {useState} from 'react';
-import { MonsterAddElement, PDFMapMonster } from './monsterAddElement';
 import { PageAddElement, pdfMapPage } from './page';
 import { v4 as uuidGen } from 'uuid';
 
 // go imports
 import {GetPDF as GETPDF} from '../../../../wailsjs/go/main/App';
+import {SaveCSV, SavePDFMap, OpenPDFMap} from '../../../../wailsjs/go/main/App';
+import { main } from '../../../../wailsjs/go/models';
 
 export function Add() {
     const [pdfURL, setPDFURL] = useState('');
     const [pdfName, setPDFName] = useState('');
     
     function GetPDF() {
-        GETPDF().then(pdfURL => {
+        GETPDF().then((pdfURL) => {
             setPDFURL(pdfURL);
             let pdfName = JSON.stringify(pdfURL).split('\\').pop()?.split('.')[0];
             setPDFName(pdfName ? pdfName : '');
@@ -60,18 +61,17 @@ interface AddModifyWorkingAreaParameters {
     pdfURL: string,
 }
 function AddModifyWorkingArea({pdfName, pdfURL} : AddModifyWorkingAreaParameters) {
-    const [pdfMap, setPDFMap] = useState(new Array<pdfMapPage>);
+    const [pdfMap, setPDFMap] = useState(new Array<main.PDFMapPage>);
 
     function addPage() {
         let pageNumber: number = pdfMap.length > 0 ? pdfMap[pdfMap.length - 1].pageNumber + 1 : 1;
-        console.log(pageNumber);
+        let newPDFMapPage = new main.PDFMapPage();
+        newPDFMapPage.id = uuidGen();
+        newPDFMapPage.pageNumber = pageNumber;
+        newPDFMapPage.items = [];
         setPDFMap([
             ...pdfMap,
-            {
-                id: uuidGen(),
-                pageNumber: pageNumber,
-                items: []
-            }
+           newPDFMapPage
         ]);
     }
 
@@ -80,7 +80,7 @@ function AddModifyWorkingArea({pdfName, pdfURL} : AddModifyWorkingAreaParameters
         setPDFMap(newPDFMap);
     }
 
-    function saveItem(newPage: pdfMapPage) {
+    function saveItem(newPage: main.PDFMapPage) {
         console.log(newPage);
         let newPDFMap = pdfMap.map(page => {
             if(page.id === newPage.id) {
@@ -88,7 +88,9 @@ function AddModifyWorkingArea({pdfName, pdfURL} : AddModifyWorkingAreaParameters
             }
             return page
         })
+        console.log(newPDFMap);
         setPDFMap(newPDFMap);
+        SavePDFMap(newPDFMap, pdfURL);
     }
     
     return (
