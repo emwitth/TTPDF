@@ -22,6 +22,9 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+// This function was taken from a wails v2 example, located here:
+// https://github.com/tataDan/wails-v2-examples/blob/eb48c734627cc56bab846cd5b19e0078449458d4/examples/research/app.go#L801
+// The examples are released under the MIT license
 func (a *App) msgDlgOk(dlgType runtime.DialogType, title string, msg string) {
 	_, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 		Type:    dlgType,
