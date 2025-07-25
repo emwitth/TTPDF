@@ -5,54 +5,78 @@ import './add.scss';
 import {useState} from 'react';
 
 // go imports
-import {GetPDF as GETPDF} from '../../../../wailsjs/go/main/App';
+import {SelectPdf, GetPage, GetPageCount} from '../../../../wailsjs/go/main/App';
 
 export function Add() {
-    const [pdfURL, setPDFURL] = useState('');
-    const [pdf, setPDF] = useState('');
+    const [pdfData, setPdfData] = useState('');
+    const [pdfUrl, setPdfUrl] = useState('');
+    const [pdfName, setPdfName] = useState('');
+    const [pageNumber, setPageNumber] = useState(-1);
+    const [pageTotal, setPageTotal] = useState(-1);
     
-    function GetPDF() {
-        GETPDF().then(pdfURL => {
-            setPDFURL(pdfURL);
-            let pdf = JSON.stringify(pdfURL).split('\\').pop()?.split('.')[0];
-            setPDF(pdf ? pdf : '');
+    function ChoosePdf() {
+        SelectPdf().then(url => {
+            setPdfUrl(url);
+            let name = JSON.stringify(url).split('\\').pop()?.split('.')[0];
+            setPdfName(name ? name : '');
+            UpdateTotalPages(url);
+            LoadPage(url, 1);
         });
     }
 
-    function AddButtonComponent({GetPDF} : {GetPDF: () => void}) {
-        if (pdf !== '') {
+    function UpdateTotalPages(url: string) {
+        GetPageCount(url).then(totalPages => {
+            setPageTotal(totalPages);
+        })
+    }
+
+    function LoadPage(url: string, pageNum: number) {
+        if (pageNum <= 0 || pageNum > pageTotal) {
+            return;
+        }
+        GetPage(url, pageNum).then(data => {
+            setPdfData("data:application/pdf;base64," + data + "#toolbar=0&navpanes=0");
+            setPageNumber(pageNum);
+        })
+    }
+
+    function AddButtonComponent({ChoosePDF} : {ChoosePDF: () => void}) {
+        if (pdfData !== '') {
             return null;
         }
 
         return (
             <div>
                 <div>Click to add a pdf</div><br />
-                <button className='button' onClick={GetPDF}>Add PDF</button>
+                <button className='button' onClick={ChoosePDF}>Add PDF</button>
             </div>
         );
             
     }
 
-    function AddMonsterFormComponent({}) {
-        if(pdf === '') {
+    function PdfComponent() {
+        if (pdfData === '') {
             return null;
         }
 
         return (
-            <div>
-                <div title={pdfURL}>
-                    Adding from {pdf};
+            <>
+                <div>
+                    <button className='button' onClick={() => {LoadPage(pdfUrl, pageNumber - 1)}}>-</button>
+                    <div>{pageNumber} of {pageTotal}</div>
+                    <button className='button' onClick={() => {LoadPage(pdfUrl, pageNumber + 1)}}>+</button>
                 </div>
-                CR <input></input>
-            </div>
-        );
+                <object data={pdfData} type="application/pdf" className='pdf'></object>
+            </>
+        )
     }
 
     return (
         <div className='add-container'>
-            <div className='work-container'>
-                <AddButtonComponent GetPDF={GetPDF} />
-                <AddMonsterFormComponent/>
+            <div className='work-container'></div>
+            <div className='pdf-container'>
+                <AddButtonComponent ChoosePDF={ChoosePdf}/>
+                <PdfComponent/>
             </div>
         </div>
     );
