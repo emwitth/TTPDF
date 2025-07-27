@@ -10,6 +10,10 @@ export function GetPageCount(arg1) {
   return window['go']['main']['App']['GetPageCount'](arg1);
 }
 
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
+}
+
 export function SelectPdf() {
   return window['go']['main']['App']['SelectPdf']();
 }

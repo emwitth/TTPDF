@@ -2,15 +2,24 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx         context.Context
+	defaultPath string
+}
+
+type AppSettings struct {
+	DefaultPath string `json:"defaultPath"`
 }
 
 // NewApp creates a new App application struct
@@ -22,6 +31,21 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+
+	// Load settings
+	settingsFile, err := os.ReadFile("./config.json")
+	if err != nil {
+		fmt.Printf("Error when opening file: %s", err)
+		return
+	}
+
+	var settings AppSettings
+	err = json.Unmarshal(settingsFile, &settings)
+	if err != nil {
+		fmt.Printf("Error when unmarshalling data: %s", err)
+		return
+	}
+	a.defaultPath = settings.DefaultPath
 }
 
 /*
@@ -42,22 +66,34 @@ func (a *App) msgDlgOk(dlgType runtime.DialogType, title string, msg string) {
 	}
 }
 
+func (a *App) GetSettings() AppSettings {
+	settings := &AppSettings{}
+	settings.DefaultPath = a.defaultPath
+	return *settings
+}
+
 func (a *App) SelectPdf() string {
 	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Select File",
 	})
+	slashFile := filepath.ToSlash(file)
 
 	if err != nil {
-		a.msgDlgOk(runtime.ErrorDialog, "Error: file failed to open", err.Error())
+		a.msgDlgOk(runtime.ErrorDialog, "Error:' file failed to open", err.Error())
 		return ""
 	}
 
-	if file == "" {
+	if slashFile == "" {
 		a.msgDlgOk(runtime.ErrorDialog, "Error: failed to choose a file", "no file chosen")
 		return ""
 	}
 
-	return file
+	if !strings.Contains(slashFile, a.defaultPath) {
+		a.msgDlgOk(runtime.ErrorDialog, "Error: failed to choose file", "file is not in "+a.defaultPath)
+	}
+
+	// This returns with quotes around it and I have no idea why or how to fix it on the go side
+	return slashFile
 }
 
 func (a *App) GetPageCount(filePath string) int {
