@@ -62,9 +62,13 @@ export function Add() {
         return (
             <>
                 <div>
-                    <button className='button' onClick={() => {LoadPage(pdfUrl, pageNumber - 1)}}>-</button>
+                    <button className='button' onClick={() => {LoadPage(pdfUrl, pageNumber - 1)}}>
+                        <i className='fa fa-minus'></i>
+                    </button>
                     <div>{pageNumber} of {pageTotal}</div>
-                    <button className='button' onClick={() => {LoadPage(pdfUrl, pageNumber + 1)}}>+</button>
+                    <button className='button' onClick={() => {LoadPage(pdfUrl, pageNumber + 1)}}>
+                        <i className='fa fa-plus'></i>
+                    </button>
                 </div>
                 <object data={pdfData} type="application/pdf" className='pdf'></object>
             </>
