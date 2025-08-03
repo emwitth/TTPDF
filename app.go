@@ -92,6 +92,8 @@ func (a *App) SelectPdf() string {
 		a.msgDlgOk(runtime.ErrorDialog, "Error: failed to choose file", "file is not in "+a.defaultPath)
 	}
 
+	go a.parsePdf(slashFile)
+
 	// This returns with quotes around it and I have no idea why or how to fix it on the go side
 	return slashFile
 }
