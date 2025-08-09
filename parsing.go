@@ -15,6 +15,11 @@ const (
 	Monster5ePdfItemType PdfMapItemType = 0
 )
 
+type PdfMapItemSection struct {
+	itemText string
+	itemType PdfMapItemType
+}
+
 // Strips text of newlines and converts all to lowercase.
 func (a *App) normalizeTextForParsing(text string) string {
 	// Standardize the text to one line and lowercase
@@ -23,9 +28,10 @@ func (a *App) normalizeTextForParsing(text string) string {
 	return safeText
 }
 
-// Looks at an item and tries to determine it's PdfMapItemType.
+// Looks at an item and tries to determine the pdf map items it contains.
+// Returns an array of pdfMapItemSections.
 // Type 'unknown' means we have no idea what is going on.
-func (a *App) deducePdfMapItemType(text string) PdfMapItemType {
+func (a *App) deducePdfMapItemTypes(text string) []PdfMapItemSection {
 	safeText := a.normalizeTextForParsing(text)
 	// For now, we assume one type per text, but that may change.
 	// Likewise, we are starting with just parsing 5e Monsters.
@@ -33,18 +39,30 @@ func (a *App) deducePdfMapItemType(text string) PdfMapItemType {
 	// Honestly, this is prime realestate for an LLM,
 	// but I don't feel like dealing with one of those for my little
 	// hobby side project...
-	sizeR := regexp.MustCompile("tiny|small|large|medium|huge|gargantuan")
+	startOfMonsterR := regexp.MustCompile(`([a-z]+ ){0,3}(tiny|small|large|medium|huge|gargantuan).+(chaotic|lawful|neutral) (evil|good|neutral)`)
 	hpR := regexp.MustCompile(`hit points [0-9]+`)
 	strR := regexp.MustCompile(`str [0-9]+`)
+	mapItemSections := []PdfMapItemSection{}
 
-	fmt.Println(sizeR.MatchString(safeText))
-	fmt.Println(hpR.MatchString(safeText))
-	fmt.Println(strR.MatchString(safeText))
-	if sizeR.MatchString(safeText) && hpR.MatchString(safeText) && strR.MatchString(safeText) {
-		return Monster5ePdfItemType
+	if startOfMonsterR.MatchString(safeText) && hpR.MatchString(safeText) && strR.MatchString(safeText) {
+		charCoordsArray := startOfMonsterR.FindAllStringIndex(safeText, -1)
+
+		for i := 0; i < len(charCoordsArray); i++ {
+			section := PdfMapItemSection{}
+			startIndex := charCoordsArray[i][0]
+			endIndex := 0
+			if i >= len(charCoordsArray)-1 {
+				endIndex = len(safeText)
+			} else {
+				endIndex = charCoordsArray[i+1][0]
+			}
+			section.itemText = safeText[startIndex:endIndex]
+			section.itemType = Monster5ePdfItemType
+			mapItemSections = append(mapItemSections, section)
+		}
 	}
 
-	return UnknownPdfItemType
+	return mapItemSections
 }
 
 // Takes a string and parses out 5e monster attributes.
@@ -64,7 +82,12 @@ func (a *App) parse5eMonsterText(text string) Monster5e {
 	numberCommaR := regexp.MustCompile(`[0-9,]+`)
 	nameR := regexp.MustCompile(`([a-z]+ ){1,3}(tiny|small|large|medium|huge|gargantuan)`)
 	sizeR := regexp.MustCompile(`tiny|small|large|medium|huge|gargantuan`)
-	typeR := regexp.MustCompile("(tiny|small|large|medium|huge|gargantuan) [a-z]+")
+	typeR := regexp.MustCompile(`(tiny|small|large|medium|huge|gargantuan) [a-z]+`)
+	alignmentR := regexp.MustCompile(`(chaotic|lawful|neutral) (evil|good|neutral)`)
+	chaoticR := regexp.MustCompile(`chaotic`)
+	lawfulR := regexp.MustCompile(`lawful`)
+	goodR := regexp.MustCompile(`good`)
+	evilR := regexp.MustCompile(`evil`)
 	hpR := regexp.MustCompile(`hit points [0-9]+ \([0-9]+d[0-9]+ (\+|\-) [0-9]+\)`)
 	hpNoModR := regexp.MustCompile(`hit points [0-9]+ \([0-9]+d[0-9]+\)`)
 	speedR := regexp.MustCompile(`speed [0-9]+`)
@@ -129,9 +152,25 @@ func (a *App) parse5eMonsterText(text string) Monster5e {
 	if len(typeArray) == 2 {
 		monster.Type = typeArray[1]
 	}
+	// ALIGNMENT
+	if alignmentR.MatchString(safeText) {
+		alignmentString := alignmentR.FindString(safeText)
+		if chaoticR.MatchString(alignmentString) {
+			monster.Alignment = monster.Alignment + Chaotic
+		}
+		if lawfulR.MatchString(alignmentString) {
+			monster.Alignment = monster.Alignment + Lawful
+		}
+		if goodR.MatchString(alignmentString) {
+			monster.Alignment = monster.Alignment + Good
+		}
+		if evilR.MatchString(alignmentString) {
+			monster.Alignment = monster.Alignment + Evil
+		}
+	}
 	// HIT POINTS
-	var hpLine string
-	var hpDiceLine string
+	hpLine := "0"
+	hpDiceLine := "0d0"
 	if hpR.MatchString(safeText) {
 		hpLine = hpR.FindString(safeText)
 		hpDiceLine = diceR.FindString(safeText)

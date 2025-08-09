@@ -1,13 +1,11 @@
 package main
 
-type Alignment5e int
-
 const (
-	Neutral Alignment5e = 0b0000
-	Chaotic Alignment5e = 0b0001
-	Lawful  Alignment5e = 0b0010
-	Evil    Alignment5e = 0b0100
-	Good    Alignment5e = 0b1000
+	Neutral int = 0b0000
+	Chaotic int = 0b0001
+	Lawful  int = 0b0010
+	Evil    int = 0b0100
+	Good    int = 0b1000
 )
 
 type Monster5e struct {

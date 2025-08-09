@@ -84,14 +84,16 @@ func (a *App) parsePdfPage(path string, index int) error {
 	text := buf.String()
 
 	// Figure out what is going on with the text and handle it accordingly
-	itemType := a.deducePdfMapItemType(text)
-	switch itemType {
-	case Monster5ePdfItemType:
-		a.parse5eMonsterText(text)
-	case UnknownPdfItemType:
-		fallthrough
-	default:
-		fmt.Printf("Couldn't figure out the type of text from %s\n", path)
+	pageItems := a.deducePdfMapItemTypes(text)
+	for i := 0; i < len(pageItems); i++ {
+		switch pageItems[i].itemType {
+		case Monster5ePdfItemType:
+			a.parse5eMonsterText(pageItems[i].itemText)
+		case UnknownPdfItemType:
+			fallthrough
+		default:
+			fmt.Printf("Couldn't figure out the type of text from %s\n", path)
+		}
 	}
 
 	return nil
